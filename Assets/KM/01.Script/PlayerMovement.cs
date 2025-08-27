@@ -20,9 +20,10 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D _rbCompo;
     private Vector2 _moveVec;
 
+    private bool _isGrounded;
     #region NetWorkData
     //점프를 했는가? (Is Jumping Now? <bool>)
-    private bool _isGrounded;
+    private bool _isJumpNow = false;
     //대쉬를 하고 있는가?(Is Dashing Now? <bool>)
     private bool _isDashing;
     //대쉬할 방향(Dash Direction<Vec2>)
@@ -75,6 +76,7 @@ public class PlayerMovement : MonoBehaviour
         if (!_isGrounded)
         {
             currentJumpCount = maxJumpCount;
+            _isJumpNow = false;
             CanDash = false;
         }
     }
@@ -100,6 +102,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (currentJumpCount > 0)
         {
+            _isJumpNow = true;
             _rbCompo.linearVelocityY = jumpForce;
             currentJumpCount--;
         }
