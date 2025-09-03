@@ -64,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Keyboard.current.sKey.wasPressedThisFrame && _isGrounded)
         {
-            _rbCompo.AddForce(Vector2.down * gravity * 2f, ForceMode2D.Impulse);
+            _rbCompo.AddForce(Vector2.down * gravity * 1.5f, ForceMode2D.Impulse);
         }
     }
 
