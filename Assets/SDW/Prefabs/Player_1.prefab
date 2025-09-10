@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 2302351380258927924}
   - component: {fileID: 1381460359211356479}
   - component: {fileID: 2098714865056283529}
-  - component: {fileID: 3211723594216944467}
   - component: {fileID: 3649838592694370226}
-  m_Layer: 5
+  - component: {fileID: 1529715567348253626}
+  m_Layer: 10
   m_Name: Player_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -155,29 +155,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &3211723594216944467
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 645450845557675079}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ced3ec310c1a1ad4c852ee06b886b0f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 10
-  jumpForce: 12
-  gravity: 9.8
-  groundCheckVecSize: {x: 0.5, y: 0.1}
-  groundCheckVec: {x: 0, y: -0.5}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 64
-  dashForce: 20
-  dashDuration: 0.2
-  maxJumpCount: 3
 --- !u!114 &3649838592694370226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -208,3 +185,26 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &1529715567348253626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 645450845557675079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c2b8a178bedc694c885059eaac726f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 10
+  jumpForce: 12
+  gravity: 9.8
+  groundCheckVecSize: {x: 0.5, y: 1.05}
+  groundCheckVec: {x: 0, y: 0}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 64
+  dashForce: 20
+  dashDuration: 0.2
+  maxJumpCount: 3

@@ -44,20 +44,14 @@ namespace SDW
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            if (collision.collider.CompareTag("Player"))
-            {
-                // 플레이어를 자식으로 넣어서 팅기지 않도록 하기
-                collision.transform.SetParent(transform, true);
-            }
+            // 플레이어를 자식으로 넣어서 팅기지 않도록 하기
+            collision.transform.SetParent(transform, true);
         }
 
         private void OnCollisionExit2D(Collision2D collision)
         {
-            if (collision.collider.CompareTag("Player"))
-            {
-                // 플레이어를 자식에서 빼기
-                collision.transform.SetParent(null);
-            }
+            // 플레이어를 자식에서 빼기
+            collision.transform.SetParent(null);
         }
     }
 }

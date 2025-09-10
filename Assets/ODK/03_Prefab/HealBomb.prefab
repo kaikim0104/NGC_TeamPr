@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7192669531820239440}
   - component: {fileID: 7576049106488130047}
   - component: {fileID: 4137711643841175174}
-  m_Layer: 6
+  m_Layer: 31
   m_Name: HealBomb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -175,21 +175,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e928eb0f8d69d64eb1959b1c454623a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Id: 0
   iscooldown: 0
   isshooting: 0
   effect:
   - {fileID: 4126250750794429402, guid: 183b9334105966344a3d1cd1de0e55e0, type: 3}
   targetLayer:
     serializedVersion: 2
-    m_Bits: 16
+    m_Bits: 1024
   groundLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 2147483712
   owner: {fileID: 0}
   preowner: {fileID: 0}
   shootingdir: {x: 0, y: 0}
   thisisnoforceobject: 0
   thisownerfading: 1
-  damage: -20
-  knockbackmulti: 0
+  damage: -35
+  knockbackmulti: 3
   explosion: {fileID: 8299260641495768406, guid: bf69bb84027656448baa2e32a65f6d58, type: 3}

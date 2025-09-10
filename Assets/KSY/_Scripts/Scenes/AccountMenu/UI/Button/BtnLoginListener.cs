@@ -55,13 +55,13 @@ public class BtnLoginListener : MonoBehaviour
             //아이디나 비밀번호가 틀렸을 시 처리
             case 401:
                 {
-                    UIManager.Instance.UpdateText("Login/ErrorInfo", "Invalid id or password.");
+                    //UIManager.Instance.UpdateText("Login/ErrorInfo", "Invalid id or password.");
                     break;
                 }
             //차단당한 아이디일 경우 처리
             case 403:
                 {
-                    UIManager.Instance.UpdateText("Login/ErrorInfo", "This account has been banned.");
+                    //UIManager.Instance.UpdateText("Login/ErrorInfo", "This account has been banned.");
                     break;
                 }
             //그 밖에 예외처리
@@ -69,7 +69,9 @@ public class BtnLoginListener : MonoBehaviour
                 {
                     //성공이 아닐 경우
                     if(statusCode != 200)
-                    UIManager.Instance.UpdateText("Login/ErrorInfo", "Login failed");
+                    {
+                        //UIManager.Instance.UpdateText("Login/ErrorInfo", "Login failed");
+                    }
                     break;
                 }
         }
@@ -80,7 +82,7 @@ public class BtnLoginListener : MonoBehaviour
     {
         if(isConnected == false)
         {
-            UIManager.Instance.UpdateText("Login/ErrorInfo", "Enter MatchServer failed");
+            //UIManager.Instance.UpdateText("Login/ErrorInfo", "Enter MatchServer failed");
         }
     }
 }

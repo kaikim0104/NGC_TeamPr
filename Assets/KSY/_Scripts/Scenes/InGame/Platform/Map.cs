@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using BackEnd;
 using Google.FlatBuffers;
-using InputData.Platform;
+using InputData.Map;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -9,17 +10,18 @@ public class Map : MonoBehaviour
 {
     //¾À¿¡ ÀÖ´Â ¸ðµç ÇÃ·§ÆûÀ» ´ã´Â ¹è¿­
     private Dictionary<byte, Platform> _platfomrs;
-    private List<Transform> _startPos = new List<Transform>(2);
+    [field:SerializeField]public Spawner Spawner { get; private set; }
+
+    [SerializeField ]private Transform[] _startPos = new Transform[2];
     private void Start()
     {
+        //¾À¿¡ ÀÖ´Â ½ºÆ÷³Ê¸¦ °¡Á®¿È
+        this.Spawner = GetComponentInChildren<Spawner>();
         //¾À¿¡ ÀÖ´Â ¸ðµç ÇÃ·§ÆûÀ» °¡Á®¿È
         Platform[] platforms = GetComponentsInChildren<Platform>();
 
         //ÇÃ·§Æû °³¼ö ¸¸Å­ µñ¼Å³Ê¸® °ø°£ ¸¶·Ã
         _platfomrs = new Dictionary<byte, Platform>(platforms.Length);
-
-        //Debug.Log($"{platforms} != null : {platforms != null}");
-        //Debug.Log(platforms);
 
         //¸ðµç ÇÃ·§ÆûÀ» ÃÊ±âÈ­ÇÔ
         foreach (var platform in platforms)
@@ -35,15 +37,32 @@ public class Map : MonoBehaviour
         return platform;
 
     }
-    internal void SetPos()
+    public void SetPlayerStartPos(Player p)
     {
-        if(BackEnd.Backend.Match.IsSuperGamer())
+        if(Server.IsSuperGamer)
         {
-            transform.position = _startPos[0].position;
+            if(_startPos[0] != null)
+            {
+                p.transform.position = _startPos[0].position;
+                _startPos[0] = null;
+            }
+            else
+            {
+                p.transform.position = _startPos[1].position;
+            }
+
         }
         else
         {
-            transform.position = _startPos[1].position;
+            if (_startPos[1] != null)
+            {
+                p.transform.position = _startPos[1].position;
+                _startPos[1] = null;
+            }
+            else
+            {
+                p.transform.position = _startPos[0].position;
+            }
         }
     }
 }

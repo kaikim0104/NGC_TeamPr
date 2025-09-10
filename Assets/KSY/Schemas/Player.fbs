@@ -9,6 +9,10 @@ table Movement {
 
 table ItemAction{
 	action_state:ubyte;
+	action_item_id:ushort;
+	shot_dir_x:byte;
+	shot_dir_y:byte;
+	charg_gauge:ubyte;
 }
 
 union PlayerMessageType{

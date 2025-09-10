@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class ItemShotScript : MonoBehaviour
 {
+    public bool isItemHold; // 아이템을 들었는가?
+    public bool isItemShot;// 아이템을 던졋는가?
+
     [SerializeField] private Transform holdTransform;
     [SerializeField] private GameObject holdObject;
     private Rigidbody2D rb;
@@ -109,6 +112,7 @@ public class ItemShotScript : MonoBehaviour
                 rbh.gravityScale = 2.75f;
                 rbh.GetComponent<Collider2D>().isTrigger = false;
                 holditem.transform.localPosition = Vector2.zero;
+                isItemHold = true;
             }
         }
 
@@ -164,6 +168,7 @@ public class ItemShotScript : MonoBehaviour
 
     private void Shoot()
     {
+        isItemShot = true;
         if (holdObject == null) return;
         Vector2 dir = GetInputDirection();
         Item itemScript = holdObject.GetComponent<Item>();

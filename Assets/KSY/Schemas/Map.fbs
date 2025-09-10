@@ -1,0 +1,24 @@
+namespace InputData.Map;
+
+table PlatformState {
+	id:ubyte;
+	platform_state:ubyte;
+}
+
+table SpawnerInfo{
+	spawn_item_id:ushort;
+	spawn_item_index:ubyte;
+	spawn_point_index:ubyte;
+}
+
+union MapMessageType{
+	platform_state:PlatformState,
+	spawner_info:SpawnerInfo
+}
+
+table MapMessage{
+	map_message_type:MapMessageType;
+}
+
+file_identifier "MAPP";
+root_type MapMessage;

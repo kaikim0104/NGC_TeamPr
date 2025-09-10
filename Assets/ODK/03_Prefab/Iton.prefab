@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4655551967093659944}
   - component: {fileID: 9206428774507335267}
   - component: {fileID: 5497486583308851731}
-  m_Layer: 6
+  m_Layer: 31
   m_Name: Iton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -175,20 +175,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ed98fc2db6cf8141a80e363069e852a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Id: 0
   iscooldown: 0
   isshooting: 0
   effect:
   - {fileID: 4126250750794429402, guid: 9da0e281e311b1142bcbb49d5bfeec00, type: 3}
   targetLayer:
     serializedVersion: 2
-    m_Bits: 16
+    m_Bits: 1024
   groundLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 2147483712
   owner: {fileID: 0}
   preowner: {fileID: 0}
   shootingdir: {x: 0, y: 0}
   thisisnoforceobject: 0
   thisownerfading: 1
-  damage: 15
+  damage: 35
   knockbackmulti: 2

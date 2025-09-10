@@ -7,7 +7,7 @@ public class BtnRetryListener : MonoBehaviour
     {
         if(Server.Instance.TryInitialize())
         {
-            UIManager.Instance.HideUI("RetryInitialize");
+            //UIManager.Instance.HideUI("RetryInitialize");
         }
     }
 }

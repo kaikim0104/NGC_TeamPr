@@ -1881,6 +1881,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Map: {fileID: 0}
+  MapLoaded: 0
 --- !u!1 &1110475519
 GameObject:
   m_ObjectHideFlags: 0

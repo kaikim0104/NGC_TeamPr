@@ -28,7 +28,7 @@ public class OtherMovement : Player
     //�뽬�� ����(Dash Direction<Vec2>)
     private Vector2 _dashDir;
     //�뽬�� ����ߴ°�? (Use Dash? <bool>)
-    private bool CanDash = false;
+    private bool _usingDash = false;
     //�̵��ϰ� �ִ� ���� (Now Move.X Direction <Sbyte>)
     private bool _usingDownDash = false;
     #endregion
@@ -86,7 +86,7 @@ public class OtherMovement : Player
         if (_isGrounded)
         {
             _usingJump = false;
-            CanDash = false;
+            _usingDash = false;
         }
     }
     public void OnJump()
@@ -128,7 +128,7 @@ public class OtherMovement : Player
 
     public void OnDash()
     {
-        if (!CanDash)
+        if (!_usingDash)
         {
 
             Vector2 inputDir = _moveVec.normalized;
@@ -159,9 +159,8 @@ public class OtherMovement : Player
     }
     public override void ApplyByteData(byte state)
     {
-        //�뽬�� �ߴ°�?
         bool usingDash = (state & (byte)flagPlayerMovementState.UsingDash) != 0;
-        CanDash = usingDash;
+        _usingDash = usingDash;
         if (!_isDashing && usingDash)
         {
             Debug.Log($"isDash : {usingDash}");
@@ -170,11 +169,9 @@ public class OtherMovement : Player
             AirDash();
         }
 
-        //�޸��� �ִ°�?
         bool isDashing = (state & (byte)flagPlayerMovementState.IsDashing) != 0;
         _isDashing = isDashing;
 
-        //������ �ϰ� �ִ°�?
         bool isJumping = (state & (byte)flagPlayerMovementState.IsJumping) != 0;
         if (_isGrounded && isJumping)
         {
@@ -187,6 +184,17 @@ public class OtherMovement : Player
         float _moveX = moveX;
         _moveVec.x = _moveX;
         _dashDir = new Vector2(dashX, dashY);
+    }
+    public override void Send()
+    {
+        Vector2 dashDir = _dashDir;
+        sbyte moveX = (sbyte)_moveVec.x;
+        bool usingJump = _usingJump;
+        bool usingDash = _usingDash;
+        bool isDashing = _isDashing;
+
+        byte[] bff = Server.Instance.SerializationPlayerMovementData(dashDir, moveX, usingJump, usingDash, isDashing);
+        Server.Instance.Send(bff);
     }
 
 #if UNITY_EDITOR

@@ -1,7 +1,12 @@
 using System.Collections;
+using System.Linq;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 public abstract class Item : MonoBehaviour
 {
+    public static ushort Counter;
+    public ushort Id;
+
     public bool iscooldown = false;
     public bool isshooting = false;
     [SerializeField] protected GameObject[] effect;
@@ -16,6 +21,10 @@ public abstract class Item : MonoBehaviour
     public virtual void Awake()
     {
         rigidbody = GetComponent<Rigidbody2D>();
+
+        //아이템에 아이디를 부여
+        //Debug.Log($"Item Id : {Counter}");
+        Id = Counter++;
     }
     protected virtual void OnCollisionStay2D(Collision2D collision)
     {
@@ -54,6 +63,8 @@ public abstract class Item : MonoBehaviour
     }
     public virtual IEnumerator Attacking(GameObject target)
     {
+        Debug.Log($"Try Attack {gameObject.name} -> {target.name}");
+
         foreach (var item in effect)
         {
             item.SetActive(true);
@@ -81,5 +92,17 @@ public abstract class Item : MonoBehaviour
         if (thisownerfading) owner = null;
 
         iscooldown = false;
+    }
+    private void OnEnable()
+    {
+        Spawner.OnItemSpawned?.Invoke();
+    }
+
+    private void OnDestroy()
+    {
+
+        //Game.Instance.Map.Spawner.Items.Remove(Id);
+
+        Spawner.OnItemCollected?.Invoke();
     }
 }

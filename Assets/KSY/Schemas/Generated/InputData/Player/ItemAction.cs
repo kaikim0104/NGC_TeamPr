@@ -20,16 +20,32 @@ public struct ItemAction : IFlatbufferObject
   public ItemAction __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public byte ActionState { get { int o = __p.__offset(4); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public ushort ActionItemId { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public sbyte ShotDirX { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetSbyte(o + __p.bb_pos) : (sbyte)0; } }
+  public sbyte ShotDirY { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetSbyte(o + __p.bb_pos) : (sbyte)0; } }
+  public byte Charge { get { int o = __p.__offset(12); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
 
   public static Offset<InputData.Player.ItemAction> CreateItemAction(FlatBufferBuilder builder,
-      byte action_state = 0) {
-    builder.StartTable(1);
+      byte action_state = 0,
+      ushort action_item_id = 0,
+      sbyte shot_dir_x = 0,
+      sbyte shot_dir_y = 0,
+      byte charge = 0) {
+    builder.StartTable(5);
+    ItemAction.AddActionItemId(builder, action_item_id);
+    ItemAction.AddCharge(builder, charge);
+    ItemAction.AddShotDirY(builder, shot_dir_y);
+    ItemAction.AddShotDirX(builder, shot_dir_x);
     ItemAction.AddActionState(builder, action_state);
     return ItemAction.EndItemAction(builder);
   }
 
-  public static void StartItemAction(FlatBufferBuilder builder) { builder.StartTable(1); }
+  public static void StartItemAction(FlatBufferBuilder builder) { builder.StartTable(5); }
   public static void AddActionState(FlatBufferBuilder builder, byte actionState) { builder.AddByte(0, actionState, 0); }
+  public static void AddActionItemId(FlatBufferBuilder builder, ushort actionItemId) { builder.AddUshort(1, actionItemId, 0); }
+  public static void AddShotDirX(FlatBufferBuilder builder, sbyte shotDirX) { builder.AddSbyte(2, shotDirX, 0); }
+  public static void AddShotDirY(FlatBufferBuilder builder, sbyte shotDirY) { builder.AddSbyte(3, shotDirY, 0); }
+  public static void AddCharge(FlatBufferBuilder builder, byte charge) { builder.AddByte(4, charge, 0); }
   public static Offset<InputData.Player.ItemAction> EndItemAction(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<InputData.Player.ItemAction>(o);
@@ -43,6 +59,10 @@ static public class ItemActionVerify
   {
     return verifier.VerifyTableStart(tablePos)
       && verifier.VerifyField(tablePos, 4 /*ActionState*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 6 /*ActionItemId*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 8 /*ShotDirX*/, 1 /*sbyte*/, 1, false)
+      && verifier.VerifyField(tablePos, 10 /*ShotDirY*/, 1 /*sbyte*/, 1, false)
+      && verifier.VerifyField(tablePos, 12 /*Charge*/, 1 /*byte*/, 1, false)
       && verifier.VerifyTableEnd(tablePos);
   }
 }

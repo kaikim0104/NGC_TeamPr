@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 6722967533668644673}
   - component: {fileID: 3661066064874968218}
   - component: {fileID: 7192669531820239440}
-  - component: {fileID: 7576049106488130047}
   - component: {fileID: 4137711643841175174}
-  m_Layer: 6
+  - component: {fileID: 1609912014670461704}
+  m_Layer: 31
   m_Name: bomb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,7 +117,38 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
---- !u!61 &7576049106488130047
+--- !u!114 &4137711643841175174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2505702280169982577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e928eb0f8d69d64eb1959b1c454623a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 0
+  iscooldown: 0
+  isshooting: 0
+  effect:
+  - {fileID: 4126250750794429402, guid: 55b3702c5ec7b9243ae1337cb97d3c8c, type: 3}
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 2147483712
+  owner: {fileID: 0}
+  preowner: {fileID: 0}
+  shootingdir: {x: 0, y: 0}
+  thisisnoforceobject: 0
+  thisownerfading: 1
+  damage: 15
+  knockbackmulti: 1
+  explosion: {fileID: 8299260641495768406, guid: 83fe2ca370b60d949b9bd6d9d429faa2, type: 3}
+--- !u!61 &1609912014670461704
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -161,35 +192,5 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 15, y: 15}
   m_EdgeRadius: 0
---- !u!114 &4137711643841175174
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2505702280169982577}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e928eb0f8d69d64eb1959b1c454623a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  iscooldown: 0
-  isshooting: 0
-  effect:
-  - {fileID: 4126250750794429402, guid: 55b3702c5ec7b9243ae1337cb97d3c8c, type: 3}
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 16
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  owner: {fileID: 0}
-  preowner: {fileID: 0}
-  shootingdir: {x: 0, y: 0}
-  thisisnoforceobject: 0
-  thisownerfading: 1
-  damage: 10
-  knockbackmulti: 2
-  explosion: {fileID: 8299260641495768406, guid: 83fe2ca370b60d949b9bd6d9d429faa2, type: 3}

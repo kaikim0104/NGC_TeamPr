@@ -7,7 +7,8 @@ public class BackendFunctionMatch : MonoBehaviour
 {
     //event
     public string myNickname = null; 
-    public event Action OnEnterFindingMatch, OnFindedMatch, OnMatchCanceled;
+    public event Action EnterMatch, SuccessMatch, CanceledMatch;
+    public event Action SuccessCreateRoom, FailedCreateRoom, EnterRoom;
     public void FindMatch()
     {
         //유저가 매칭을 신청, 취소 했을 때 그리고 매칭이 성사되었을 때 호출되는 이벤트 핸들러입니다.
@@ -17,14 +18,14 @@ public class BackendFunctionMatch : MonoBehaviour
             if (args.ErrInfo == ErrorCode.Match_InProgress) 
             {
                 Debug.Log("매칭이 시작되었습니다.");
-                OnEnterFindingMatch?.Invoke();
+                EnterMatch?.Invoke();
             }
 
             //매칭 성사 처리
             if (args.MatchCardIndate != null && args.RoomInfo != null) 
             {
                 Debug.Log("매칭이 성사되었습니다.");
-                OnFindedMatch?.Invoke();
+                SuccessMatch?.Invoke();
 
                 string serverAddress = args.RoomInfo.m_inGameServerEndPoint.m_address;
                 ushort serverPort = args.RoomInfo.m_inGameServerEndPoint.m_port;
@@ -38,7 +39,7 @@ public class BackendFunctionMatch : MonoBehaviour
             //매칭 취소 처리
             if (args.ErrInfo == ErrorCode.Match_MatchMakingCanceled) 
             {
-                OnMatchCanceled.Invoke();
+                CanceledMatch.Invoke();
             }
         };
 
@@ -47,6 +48,9 @@ public class BackendFunctionMatch : MonoBehaviour
         {
             if(args.ErrInfo == ErrorCode.Success)
             {
+                //대기방 생성 성공 이벤트 호출
+                SuccessCreateRoom?.Invoke();
+
                 //대기실이 생성되면 매칭을 곧바로 시작.
                 MatchType random = MatchType.Random;
                 MatchModeType oneOnOne = MatchModeType.OneOnOne;
@@ -58,7 +62,8 @@ public class BackendFunctionMatch : MonoBehaviour
             }
             else
             {
-                //대기방 생성 실패 처리
+                //대기방 생성 실패 이벤트 호출
+                FailedCreateRoom?.Invoke();
                 Debug.LogError("대기방을 만드는 것에 실패했습니다.");
             }
         };
@@ -71,7 +76,6 @@ public class BackendFunctionMatch : MonoBehaviour
         //유저가 게임방에 입장할 때마다 호출되는 이벤트입니다.
         //+ 자기 자신에게도 호출됨.
         Backend.Match.OnMatchInGameAccess += (MatchInGameSessionEventArgs args) => {
-
             //나의 입장 수신이라면 반환
             if (args.GameRecord.m_nickname == myNickname)
             {
@@ -82,7 +86,7 @@ public class BackendFunctionMatch : MonoBehaviour
 
             //아니라면 상대방 정보를 가져옴
             MatchUserGameRecord otherInfo = args.GameRecord;
-            Server.Instance.otherInfo = otherInfo;
+            Server.Instance.InitOtherData(otherInfo);
         };
 
         //유저가 게임방 접속에 성공했을 때 입장한 유저에게만 최초 1회 호출되는 이벤트 핸들러입니다.
@@ -93,15 +97,15 @@ public class BackendFunctionMatch : MonoBehaviour
             //오류 방지를 위해 중복된 값을 제거한 채 리스트로 데이터를 반환 
             var Gamerecords = args.GameRecords.Distinct().ToList<MatchUserGameRecord>();
 
+            //게임방 접속에 성공했을 때 이벤트 호출
+            EnterRoom?.Invoke();
+
             //만약 가져온 유저 데이터의 개수가 2개가 아닐 경우, 오류가 발생한 것이기 때문에 실행하지 않고 넘어감.
-            if(Gamerecords.Count == 2)
+            if (Gamerecords.Count == 2)
             {
                 //상대방 정보를 가져옴
                 MatchUserGameRecord otherInfo = Gamerecords.Find((r) => r.m_nickname != myNickname);
-
-                //Debug.Log($"{otherInfo.m_nickname} != {myNickname}");
-
-                Server.Instance.otherInfo = otherInfo;
+                Server.Instance.InitOtherData(otherInfo);
             }
 
             //게임방 접속 성공 처리
@@ -111,6 +115,67 @@ public class BackendFunctionMatch : MonoBehaviour
                 Backend.Match.OnSessionOffline = (MatchInGameSessionEventArgs args) => {
                     Game.Instance.EnterAccountMenu();
                 };
+
+                //게임방의 게임이 종료되었을 때 호출되는 이벤트입니다.
+                //서버에서 결과 종합이 끝난 후 모든 클라이언트에서 호출되는 이벤트입니다.
+                //게임 시간이 초과되거나, 모든 클라이언트가 게임에 접속되지 못해 게임방이 파기되는 등 게임 자체가 끝나는 경우에도 호출됩니다.
+                Backend.Match.OnMatchResult = (MatchResultEventArgs args) => {
+                    switch(args.ErrInfo)
+                    {
+                        //결과 종합 성공
+                        case ErrorCode.Success:
+                            {
+
+                                break;
+                            }
+                        //1. 게임 시간 초과(콘솔에서 설정한 매치 제한 시간을 초과한 경우)
+                        //2. 게임 시작 실패(룸 생성 후 모든 유저가 게임에 접속하지 않은 경우)
+                        case ErrorCode.Match_InGame_Timeout:
+                            {
+                                switch(args.Reason)
+                                {
+                                    case "Some gamers are not connected.(0)":
+                                        {
+                                            //게임 시작 실패(룸 생성 후 모든 유저가 게임에 접속하지 않은 경우)
+                                            break;
+                                        }
+                                    case "Timeout":
+                                        {
+                                            //게임 시간 초과(콘솔에서 설정한 매치 제한 시간을 초과한 경우)
+                                            break;
+                                        }
+                                }
+                                break;
+                            }
+                        //1. 결과 종합 실패(모든 유저가 결괏값을 서버로 전송하지 않은 경우)
+                        //2. 결과 종합 실패(결과에 포함되어 있는 승/패 유저 리스트와 실제 팀 유저들이 일치하지 않는 경우)
+                        case ErrorCode.Exception:
+                            {
+                                switch(args.Reason)
+                                {
+                                    case "error: Success, status: 400, reason: {\"errorCode\":\"BadParameterException\",\"message\":\"bad headCount, 잘못된 headCount 입니다\",\"statusCode\":400}":
+                                        {
+
+                                            break;
+                                        }
+                                    case "Success, status: 400, reason: {\"errorCode\":\"BadParameterException\",\"message\":\"bad invalid team infomation, 잘못된 invalid team infomation 입니다\",\"statusCode\":400}":
+                                        {
+
+                                            break;
+                                        }
+
+                                }
+                                break;
+                            }
+                        default:
+                            {
+
+                                break;
+                            }
+
+                    }
+                };
+
                 Game.Instance.EnterInGame();
             }
             //게임방 접속 실패 처리
@@ -141,7 +206,7 @@ public class BackendFunctionMatch : MonoBehaviour
             //예외 에러처리
             else
             {
-                Debug.LogError("Error : To enter in gameserver.");
+                Debug.LogError("Error : failed enter in gamer server");
             }
         };
 

@@ -18,7 +18,7 @@ EditorBuildSettings:
     path: Assets/KSY/_Scenes/InGame.unity
     guid: 85c6eedd8d3002a40822e1c84f24ad3b
   - enabled: 1
-    path: Assets/SDW/Scenes/Map/SDW_Map_1.unity
+    path: Assets/KSY/_Scenes/Maps/Map/KSY_Map_1.unity
     guid: 8d2843cbd2ee3b54c9119369e95680ff
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: dbb64b68a4662dc4bbdc155a708e3a22, type: 2}

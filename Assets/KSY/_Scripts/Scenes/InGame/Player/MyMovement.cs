@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements.Experimental;
 
 public class MyMovement : Player
 {
@@ -96,7 +97,7 @@ public class MyMovement : Player
             MoveX = 0;
         }
 
-        base.SendData();
+        Send();
     }
 
     public void OnJump()
@@ -107,7 +108,7 @@ public class MyMovement : Player
             _rbCompo.linearVelocityY = jumpForce;
             currentJumpCount--;
 
-            base.SendData();
+            Send();
         }
     }
 
@@ -156,8 +157,8 @@ public class MyMovement : Player
                 UsingDash = false;
                 _rbCompo.linearVelocity = Vector2.zero;
             }
-
-            base.SendData();
+            
+            Send();
 
             if (IsDashing) return;
 
@@ -177,10 +178,16 @@ public class MyMovement : Player
             IsDashing = true;
             _dashTimer = dashDuration;
 
-            base.SendData();
+            Send();
 
         }
     }
+
+    public override void Send()
+    {
+        byte[] bff = Server.Instance.SerializationPlayerMovementData(DashDir, MoveX,UsingJump,UsingDash,IsDashing);
+        Server.Instance.Send(bff);
+}
 
 #if UNITY_EDITOR
     private void OnDrawGizmos()

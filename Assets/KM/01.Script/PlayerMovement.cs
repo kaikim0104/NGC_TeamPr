@@ -130,7 +130,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 _isDashing = false;
             }
-            GetComponent<SpriteRenderer>().color = new Color(1,1,1,0.5f);
+            //GetComponent<SpriteRenderer>().color = new Color(1,1,1,0.5f);
             return;
         }
     }

@@ -24,7 +24,7 @@ public class FallingPlatform : Platform
     private bool _isBlinking = false;
 
     //network data
-    public bool isOnPlatform = false;
+    public bool IsOnPlatform = false;
 
     private void Start()
     {
@@ -42,7 +42,7 @@ public class FallingPlatform : Platform
     private void Update()
     {
         //만약 플레이어와 플랫폼 위에 올라와 있다면
-        if (isOnPlatform)
+        if (IsOnPlatform)
         {
             //할당된 시간 세기
             OnStepped?.Invoke();
@@ -51,14 +51,16 @@ public class FallingPlatform : Platform
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        //서버가 아니라면 연산 금지
+        if (!Server.IsSuperGamer) return;
         if(collision.gameObject.layer != PlayerLayer)
             return;
 
-        isOnPlatform = true;
+        IsOnPlatform = true;
 
         //플랫폼 위에 올라왔다면 이벤트 시작.
         OnStepped?.Invoke();
-        SendData(isOnPlatform);
+        Send();
     }
 
     private void duration()
@@ -113,8 +115,14 @@ public class FallingPlatform : Platform
     //플랫폼 떨어지는 동작
     private IEnumerator Fall()
     {
-        rb.gravityScale = 1f; // 중력 적용
-        yield return new WaitForSeconds(0.5f); // 0.5초 후에 파괴
+        //쓸데없는 물리연산을 하지않기 위해서 잠궈놓았던 constraints를 해제함.
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+        //중력 적용
+        rb.gravityScale = 1f;
+
+        // 0.5초 후에 파괴
+        yield return new WaitForSeconds(0.5f); 
         Destroy(gameObject);
     }
 
