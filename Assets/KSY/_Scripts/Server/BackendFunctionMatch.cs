@@ -113,7 +113,7 @@ public class BackendFunctionMatch : MonoBehaviour
             {
                 //게임방에서 접속이 끊겼을 경우 처리
                 Backend.Match.OnSessionOffline = (MatchInGameSessionEventArgs args) => {
-                    Game.Instance.EnterAccountMenu();
+                    Game.Instance.EnterScene(SceneType.Account);
                 };
 
                 //게임방의 게임이 종료되었을 때 호출되는 이벤트입니다.
@@ -176,7 +176,7 @@ public class BackendFunctionMatch : MonoBehaviour
                     }
                 };
 
-                Game.Instance.EnterInGame();
+                Game.Instance.EnterScene(SceneType.Account);
             }
             //게임방 접속 실패 처리
             else

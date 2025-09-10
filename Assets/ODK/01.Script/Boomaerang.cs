@@ -119,7 +119,6 @@ public class Boomaerang : Item
         base.Attacking(target);
         Entity entity = target.GetComponent<Entity>();
 
-        Debug.Log($"Try Attack {gameObject.name} -> {entity.name}");
 
         if (entity != null)
         {

@@ -68,7 +68,6 @@ public class OtherAction : Player
         }
 
         if (dir == Vector2.zero) return;
-        Debug.Log("Start ThrowItem");
 
         HoldObject.transform.parent = null;
         HoldObject.transform.position = transform.position + ((Vector3)dir * 1.25f);
@@ -77,7 +76,6 @@ public class OtherAction : Player
         itemScript.preowner = transform;
         itemScript.CooldownActive();
 
-        Debug.Log("Debugging ThrowItem 1111");
         Rigidbody2D hrb = HoldObject.GetComponent<Rigidbody2D>();
         //아이템 물리연산 O
         hrb.simulated = true;
@@ -91,7 +89,6 @@ public class OtherAction : Player
                 : new Vector2(0, 0)), ForceMode2D.Impulse);
             hrb.angularVelocity += Random.Range(-180f, 180f);
         }
-        Debug.Log("Debugging ThrowItem 2222");
 
         //플레이어 던지는 반동 이펙트
         _rb.linearVelocity = Vector2.zero;
@@ -100,21 +97,21 @@ public class OtherAction : Player
         itemScript.Launching();
 
         HoldObject = null;
-        Debug.Log("End ThrowItem");
     }
 
     //수정할코드
     public override void ApplyUShortData(ushort id)
     {
-        HoldObject = Game.Instance.Map.Spawner.FindItem(id);
-        //Debug.Log("Success Apply ushort data");
+        HoldObject = Game.Instance.MapCompo.SpawnerCompo.FindItem(id);
     }
     public override void ApplyByteData(byte state, byte charge)
     {
         //Debug.Log("Success Apply Byte data");
         bool isHolding = (state & (byte)flagActionState.IsHolding) != 0;
         bool isThrowing = (state & (byte)flagActionState.IsThrowing) != 0;
+
         _chargeGauge = charge;
+
         if (isHolding)
         {
             Debug.Log($"isHolding : {isHolding}");

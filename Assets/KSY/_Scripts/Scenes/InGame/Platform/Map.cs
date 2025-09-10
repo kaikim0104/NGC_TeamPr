@@ -9,14 +9,16 @@ using UnityEngine;
 public class Map : MonoBehaviour
 {
     //¾À¿¡ ÀÖ´Â ¸ðµç ÇÃ·§ÆûÀ» ´ã´Â ¹è¿­
-    private Dictionary<byte, Platform> _platfomrs;
-    [field:SerializeField]public Spawner Spawner { get; private set; }
 
-    [SerializeField ]private Transform[] _startPos = new Transform[2];
+    [field:SerializeField]public Spawner SpawnerCompo { get; private set; }
+    [SerializeField] private Transform[] _startPos = new Transform[2];
+
+    private Dictionary<byte, Platform> _platfomrs;
+    #region Unity Event Function
     private void Start()
     {
         //¾À¿¡ ÀÖ´Â ½ºÆ÷³Ê¸¦ °¡Á®¿È
-        this.Spawner = GetComponentInChildren<Spawner>();
+        this.SpawnerCompo = GetComponentInChildren<Spawner>();
         //¾À¿¡ ÀÖ´Â ¸ðµç ÇÃ·§ÆûÀ» °¡Á®¿È
         Platform[] platforms = GetComponentsInChildren<Platform>();
 
@@ -30,6 +32,11 @@ public class Map : MonoBehaviour
             _platfomrs.Add(platform.Id, platform);
         }
     }
+    private void OnValidate()
+    {
+
+    }
+    #endregion
     public Platform FindPlatform(byte id)
     {
         //¾ÆÀÌµð °ªÀ» ÅëÇØ ÇÃ·§ÆûÀ» Ã£À½
@@ -50,7 +57,6 @@ public class Map : MonoBehaviour
             {
                 p.transform.position = _startPos[1].position;
             }
-
         }
         else
         {

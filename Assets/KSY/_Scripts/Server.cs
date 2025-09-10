@@ -194,9 +194,9 @@ public class Server : SingletonBehaviour<Server>
     {
         return _bfInGame.SerializationActionData(itemId, isHolding, isThrowing, chargeGauge, throwDir);
     }
-    public byte[] SerializationPlayerMovementData(Vector2 dashDir,sbyte moveX, bool usingJump, bool usingDash, bool isDashing)
+    public byte[] SerializationPlayerMovementData(Vector2 dashDir,sbyte moveX, bool usingJump, bool usingDash, bool isDashing, bool usingDownDash)
     {
-        return _bfInGame.SerializationPlayerMovementData(dashDir, moveX, usingJump, usingDash, isDashing);
+        return _bfInGame.SerializationPlayerMovementData(dashDir, moveX, usingJump, usingDash, isDashing, usingDownDash);
     }
 }
 

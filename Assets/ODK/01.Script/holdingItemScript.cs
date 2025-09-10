@@ -49,7 +49,7 @@ public abstract class Item : MonoBehaviour
             isshooting = false;
             owner = null;
             Instantiate(effect[0], transform.position, Quaternion.identity);
-            StartCoroutine(Attacking(collision.gameObject));
+            StartCoroutine(Attacking(collision.gameObject)); //¹ö±×
         }
     }
     

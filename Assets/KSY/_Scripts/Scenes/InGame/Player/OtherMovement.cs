@@ -30,7 +30,7 @@ public class OtherMovement : Player
     //�뽬�� ����ߴ°�? (Use Dash? <bool>)
     private bool _usingDash = false;
     //�̵��ϰ� �ִ� ���� (Now Move.X Direction <Sbyte>)
-    private bool _usingDownDash = false;
+    private bool _downDashing = false;
     #endregion
 
     private bool _startDashTimer = false;
@@ -59,16 +59,6 @@ public class OtherMovement : Player
 
     private void Update()
     {
-
-        if (Keyboard.current.sKey.wasPressedThisFrame && _isGrounded && _usingDownDash)
-        {
-            _rbCompo.AddForce(Vector2.down * gravity * 1.5f, ForceMode2D.Impulse);
-        }
-        else if (Keyboard.current.sKey.wasReleasedThisFrame)
-        {
-            _usingDownDash = false;
-        }
-
         OnGround();
         if (!_isDashing)
         {
@@ -76,6 +66,10 @@ public class OtherMovement : Player
             velocity.x = _moveVec.x * speed;
             _rbCompo.linearVelocityX = velocity.x;
         }
+    }
+    private void DownDash()
+    {
+        _rbCompo.AddForce(Vector2.down * gravity * 1.5f, ForceMode2D.Impulse);
     }
 
     private void OnGround()
@@ -85,6 +79,7 @@ public class OtherMovement : Player
 
         if (_isGrounded)
         {
+            _downDashing = false;
             _usingJump = false;
             _usingDash = false;
         }
@@ -161,6 +156,7 @@ public class OtherMovement : Player
     {
         bool usingDash = (state & (byte)flagPlayerMovementState.UsingDash) != 0;
         _usingDash = usingDash;
+
         if (!_isDashing && usingDash)
         {
             Debug.Log($"isDash : {usingDash}");
@@ -172,11 +168,22 @@ public class OtherMovement : Player
         bool isDashing = (state & (byte)flagPlayerMovementState.IsDashing) != 0;
         _isDashing = isDashing;
 
-        bool isJumping = (state & (byte)flagPlayerMovementState.IsJumping) != 0;
-        if (_isGrounded && isJumping)
+        bool UsingJump = (state & (byte)flagPlayerMovementState.UsingJump) != 0;
+        if (UsingJump)
         {
-            Debug.Log($"isjumping : {isJumping}");
+            Debug.Log($"isjumping : {UsingJump}");
             OnJump();
+        }
+
+        bool usingDownDash = (state & (byte)flagPlayerMovementState.UsingDownDash) != 0;
+
+        Debug.Log($"usingDownDash : {usingDownDash}");
+
+        if (!_downDashing && usingDownDash)
+        {
+            Debug.Log($"usingDownDash : {usingDownDash}");
+            _downDashing = usingDownDash;
+            DownDash();
         }
     }
     public override void ApplySbyteData(sbyte moveX, sbyte dashX, sbyte dashY)
@@ -184,17 +191,6 @@ public class OtherMovement : Player
         float _moveX = moveX;
         _moveVec.x = _moveX;
         _dashDir = new Vector2(dashX, dashY);
-    }
-    public override void Send()
-    {
-        Vector2 dashDir = _dashDir;
-        sbyte moveX = (sbyte)_moveVec.x;
-        bool usingJump = _usingJump;
-        bool usingDash = _usingDash;
-        bool isDashing = _isDashing;
-
-        byte[] bff = Server.Instance.SerializationPlayerMovementData(dashDir, moveX, usingJump, usingDash, isDashing);
-        Server.Instance.Send(bff);
     }
 
 #if UNITY_EDITOR

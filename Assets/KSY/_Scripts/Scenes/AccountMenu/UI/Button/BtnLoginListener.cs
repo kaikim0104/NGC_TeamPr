@@ -42,8 +42,11 @@ public class BtnLoginListener : MonoBehaviour
         if(statusCode == 200)
         {
             Server.Instance.InitMyData();
-            Game.Instance.EnterMainMenu();
+            Game.Instance.EnterScene(SceneType.MainMenu);
         }
+
+        //이벤트 할당 해제
+        OnTryLogin -= SuccessLogin;
     }
 
     //정확한 기능을 메소드 이름으로 명시할 것
@@ -75,6 +78,9 @@ public class BtnLoginListener : MonoBehaviour
                     break;
                 }
         }
+
+        //이벤트 할당 해제
+        OnTryLogin -= FailedLogin;
     }
 
     //정확한 기능을 메소드 이름으로 명시할 것

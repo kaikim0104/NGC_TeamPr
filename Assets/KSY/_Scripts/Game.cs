@@ -1,40 +1,44 @@
 using System;
+using System.Collections.Generic;
 using BackEnd;
-using BackEnd.Tcp;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static UnityEngine.EventSystems.EventTrigger;
 
+public enum SceneType
+{
+    None = 0,
+    Account,
+    MainMenu,
+    InGame
+}
 public class Game : SingletonBehaviour<Game>
 {
-    public event Action OnEnterAccountMenu;
-    public event Action OnEnterMainMenu;
-    public event Action OnEnterInGame;
+    [SerializeField] private GameDataSO _gameData;
+    
+    //씬이 다 로드된 후에 호출됨 
+    public event Action EnterAccountMenu;
+    public event Action EnterMainMenu;
+    public event Action EnterInGame;
 
-    public Map Map;
+    public bool IsAllReady { get; private set; }
+    public Map MapCompo { get; private set; }
+    [SerializeField] private string[] _mapNames;
+    [SerializeField] private byte _mapCount = 0;
 
-    string[] mapNames = { "SDW_Map_1", "SDW_Map_2", "SDW_Map_3" };
-
-    //씬이 다 로드되었다면 true
-    private bool _accountMenuLoaded;
-    private bool _mainMenuLoaded;
-    public bool MapLoaded;
-    public bool AllUserReady { get; private set; }
-
+    #region Unity Event Function
     private void Awake()
     {
         BackendReturnObject Initialize = Backend.Initialize();
 
         if (!Initialize.IsSuccess())
         {
-            //초기화에 실패했을 때 처리
-            //UIManager.Instance.ShowUI("Retry");
-            //UIManager.Instance.UpdateText("Retry/Text_ErrorInfo", "Connection failed. \nPlease try again");
+            //초기화 실패 처리
         }
     }
     private void Start()
     {
+        EnterInGame += InitPlayer;
+
         //씬이 완료되었을 떄 호출되는 이벤트 등록.
         SceneManager.sceneLoaded += (Scene s, LoadSceneMode lsm) =>
         {
@@ -46,48 +50,19 @@ public class Game : SingletonBehaviour<Game>
             {
                 case "AccountMenu":
                     {
-                        _accountMenuLoaded = true;
+                        EnterAccountMenu?.Invoke();
                         break;
                     }
                 case "MainMenu":
                     {
-                        _mainMenuLoaded = true;
+                        EnterMainMenu?.Invoke();
                         break;
                     }
-                case "KSY_Map_1":
-                    {
-                        MapLoaded = true;
-                        if (!GameObject.Find("Map").TryGetComponent(out Map)) Map = GameObject.Find("Map").AddComponent<Map>();
-                        OnEnterInGame?.Invoke();
-                        break;
-                    }
-                case "SDW_Map_1":
-                    {
-                        MapLoaded = true;
-                        if (!GameObject.Find("Map").TryGetComponent(out Map)) Map = GameObject.Find("Map").AddComponent<Map>();
-                        OnEnterInGame?.Invoke();
-
-                        break;
-                    }
-                case "SDW_Map_2":
-                    {
-                        MapLoaded = true;
-                        if (!GameObject.Find("Map").TryGetComponent(out Map)) Map = GameObject.Find("Map").AddComponent<Map>();
-                        OnEnterInGame?.Invoke();
-
-                        break;
-                    }
-                case "SDW_Map_3":
-                    {
-                        MapLoaded = true;
-                        if (!GameObject.Find("Map").TryGetComponent(out Map)) Map = GameObject.Find("Map").AddComponent<Map>();
-                        OnEnterInGame?.Invoke();
-
-                        break;
-                    }
+                //In Game Loaded
                 default:
                     {
-                        Debug.Log("해당 씬은 등록되지 않은 씬입니다.");
+                        MapCompo = GameObject.Find("Map").GetComponent<Map>();
+                        EnterInGame?.Invoke();
                         break;
                     }
             }
@@ -95,19 +70,24 @@ public class Game : SingletonBehaviour<Game>
 
         //모든 유저가 준비되었을 때 호출되는 이벤트
         Backend.Match.OnMatchInGameStart = () => {
-
-            //씬이 다 로드되고나서 실행되도록 이벤트 등록
-            if (MapLoaded)
-            {
-                AllUserReady = true;
-                InitPlayer();
-            }
-            else
-            {
-                SceneManager.sceneLoaded += InitPlayer;
-            }
+                IsAllReady = true;
         };
     }
+    private void Update()
+    {
+        Backend.Match.Poll();
+    }
+    private void OnValidate()
+    {
+        _mapNames = _gameData.MapNames;
+        _mapCount = _gameData.MapCount;
+
+        if (_mapNames.Length > _gameData.MapCount)
+        {
+            Debug.Log("<color=red>맵의 이름의 개수가 지정된 맵의 개수보다 많습니다!</color>");
+        }
+    }
+    #endregion
     private void InitPlayer()
     {
         //********내 데이터 처리********
@@ -132,7 +112,7 @@ public class Game : SingletonBehaviour<Game>
         p1.Init();
 
         //플레이어 위치 세팅
-        Map.SetPlayerStartPos(p1);
+        MapCompo.SetPlayerStartPos(p1);
 
         //********상대방 데이터 처리********
 
@@ -156,7 +136,7 @@ public class Game : SingletonBehaviour<Game>
         p2.Init();
 
         //플레이어 위치 세팅
-        Map.SetPlayerStartPos(p2);
+        MapCompo.SetPlayerStartPos(p2);
     }
     private void InitPlayer(Scene s, LoadSceneMode lsm)
     {
@@ -182,7 +162,7 @@ public class Game : SingletonBehaviour<Game>
         p1.Init();
 
         //플레이어 위치 세팅
-        Map.SetPlayerStartPos(p1);
+        MapCompo.SetPlayerStartPos(p1);
 
         //********상대방 데이터 처리********
 
@@ -206,41 +186,34 @@ public class Game : SingletonBehaviour<Game>
         p2.Init();
 
         //플레이어 위치 세팅
-        Map.SetPlayerStartPos(p2);
+        MapCompo.SetPlayerStartPos(p2);
     }
-    private void Update()
+    public void EnterScene(SceneType t)
     {
-       Backend.Match.Poll();
-    }        //컴포넌트가 있다면 가져오고 아니라면 추가
-    public void EnterAccountMenu()
-    {
-        SceneManager.LoadScene("AccountMenu");
-    }
-    public void EnterMainMenu()
-    {
-        SceneManager.LoadScene("MainMenu");
-    }
-    public void EnterInGame()
-    {
-        ////랜덤한 맵을 선정함.
-        //int mapIndex = UnityEngine.Random.Range(0, 4);
-        ////선정한 맵의 이름을 가져옴
-        //string mapName = mapNames[mapIndex];
-        ////가져온 이름의 씬(맵)을 로드함.
-        //SceneManager.LoadScene(mapName);  
+        switch(t)
+        {
+            case SceneType.Account:
+                {
+                    SceneManager.LoadScene("AccountMenu");
+                    break;
+                }
+            case SceneType.MainMenu:
+                {
+                    SceneManager.LoadScene("MainMenu");
+                    break;
+                }
+            case SceneType.InGame:
+                {
+                    ////랜덤한 맵을 선정함.
+                    //int mapIndex = UnityEngine.Random.Range(0, _mapNames.Length - 1);
+                    ////선정한 맵의 이름을 가져옴
+                    //string mapName = _mapNames[mapIndex];
+                    ////가져온 이름의 씬(맵)을 로드함.
+                    //SceneManager.LoadScene(mapName);
 
-        SceneManager.LoadScene("KSY_Map_1");
-    }
-    public void ExitAccountMenu()
-    {
-
-    }
-    public void ExitMainMenu()
-    {
-
-    }
-    public void ExitInGame()
-    {
-
+                    SceneManager.LoadScene("KSY_Map_1");
+                    break;
+                }
+        }   
     }
 }

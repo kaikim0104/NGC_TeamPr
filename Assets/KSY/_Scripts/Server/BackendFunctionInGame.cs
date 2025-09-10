@@ -21,13 +21,16 @@ public class BackendFunctionInGame : MonoBehaviour
         None = 0b0000,
 
         //1 
-        IsJumping = 0b0001,
+        UsingJump = 0b0001,
 
         //2
         IsDashing = 0b0010,
 
         //4
-        UsingDash = 0b0100
+        UsingDash = 0b0100,
+
+        //8
+        UsingDownDash = 0b1000
     }
     [Flags]
     public enum flagPlatformState : byte
@@ -120,7 +123,7 @@ public class BackendFunctionInGame : MonoBehaviour
 
         return bff;
     }
-    public byte[] SerializationPlayerMovementData(Vector2 dashDir, sbyte dataMoveX, bool dataIsGrounded, bool dataCanDash, bool dataIsDashing)
+    public byte[] SerializationPlayerMovementData(Vector2 dashDir, sbyte dataMoveX, bool isGrounded, bool usingDash, bool isDashing, bool usingDownDash)
     {
         //버퍼 재사용
         _movementBuilder.Clear();
@@ -131,14 +134,15 @@ public class BackendFunctionInGame : MonoBehaviour
         sbyte dashY = (sbyte)dashDir.y;
 
         //비트 마스킹
-        byte State = 0b0000;
+        byte state = 0b0000;
 
-        if (dataIsGrounded) State |= (byte)flagPlayerMovementState.IsJumping;
-        if (dataIsDashing) State |= (byte)flagPlayerMovementState.IsDashing;
-        if (dataCanDash) State |= (byte)flagPlayerMovementState.UsingDash;
+        if (isGrounded) state |= (byte)flagPlayerMovementState.UsingJump;
+        if (isDashing) state |= (byte)flagPlayerMovementState.IsDashing;
+        if (usingDash) state |= (byte)flagPlayerMovementState.UsingDash;
+        if (usingDownDash) state |= (byte)flagPlayerMovementState.UsingDownDash;
 
         //오프셋 세팅 + 데이터 할당
-        Offset<Movement> offsetMovementData = Movement.CreateMovement(_movementBuilder, State, moveX, dashX, dashY);
+        Offset<Movement> offsetMovementData = Movement.CreateMovement(_movementBuilder, state, moveX, dashX, dashY);
         Offset<PlayerMessage> offsetResultData = PlayerMessage.CreatePlayerMessage(_movementBuilder, PlayerMessageType.movement, offsetMovementData.Value);
 
         //스키마 버퍼화
@@ -152,7 +156,7 @@ public class BackendFunctionInGame : MonoBehaviour
     //데이터 송신
     public void Send(byte[] bff)
     {
-        if (!Game.Instance.AllUserReady)
+        if (!Game.Instance.IsAllReady)
         {
             Debug.LogError("map un loaded.");
             return;
@@ -172,7 +176,7 @@ public class BackendFunctionInGame : MonoBehaviour
                     byte senderId = message.MapMessageTypeAsplatform_state().Id;
 
                     //(송신한) 수신 받을 플랫폼을 아이디로 찾음
-                    Platform platform = Game.Instance.Map.FindPlatform(senderId);
+                    Platform platform = Game.Instance.MapCompo.FindPlatform(senderId);
 
                     //MapMessage에서 데이터를 꺼내서 적용함.
                     PlatformState data = message.MapMessageTypeAsplatform_state();
@@ -184,7 +188,7 @@ public class BackendFunctionInGame : MonoBehaviour
             case MapMessageType.spawner_info:
                 {
                     //씬에 있는 스포너를 가져옴
-                    Receiver = Game.Instance.Map.Spawner;
+                    Receiver = Game.Instance.MapCompo.SpawnerCompo;
 
                     SpawnerInfo data = message.MapMessageTypeAsspawner_info();
                     ushort spawnItemId = data.SpawnItemId;

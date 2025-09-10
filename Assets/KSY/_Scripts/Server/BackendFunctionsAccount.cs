@@ -16,7 +16,7 @@ public class BackendFunctionsAccount : MonoBehaviour
                 //서버로부터 계정의 정보를 가져와 UserData에 할당
                 //MainMenu로 이동
                 Server.Instance.InitMyData();
-                Game.Instance.EnterMainMenu();
+                Game.Instance.EnterScene(SceneType.MainMenu);
             }
             else
             {

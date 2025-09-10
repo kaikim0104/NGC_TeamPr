@@ -1,108 +1,119 @@
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
-using static UnityEditor.Progress;
 using Random = UnityEngine.Random;
 
 public class Spawner : MonoBehaviour, IReceiver, ISender
 {
-    [Header("스폰 포인트 & 아이템")]
-    [SerializeField] private GameObject[] SpawnerPoints;
-    [SerializeField] private GameObject[] ItemPrefabs;
+    [Header("SO")]
+    [SerializeField] SpawnerDataSO _spawnerData;
 
-    [Header("스폰 타이머 & 최대 아이템 갯수")]
-    [SerializeField] private float Spawnertimer = 2;
-    [SerializeField] private int MaxCount = 5;
 
+    [Header("SO Data")]
+    //스폰 시간
+    [SerializeField] private float _spawnSecconds = 0f;
+    //아이템 최대 스폰 갯수를 설정하는 변수
+    [SerializeField] private int _maxCount;
+    //생성할 아이템의 종류
+    [SerializeField] private GameObject[] _itemPrefabs;
+
+
+    [Header("Spawned Item")]
     [SerializeField] private GameObject spawnObject;
 
 
-    public Dictionary<ushort, GameObject> Items = new Dictionary<ushort, GameObject>();
-    private int _itemCount;
-    private float _currentTimer;
+    public Dictionary<ushort, GameObject> _items = new Dictionary<ushort, GameObject>();
+
+    //스폰 시간을 체크하는 변수
+    private float _spawnTimmer = 0f;
+
+    //아이템의 현재 갯수를 가지는 변수
+    private int _itemCount = 0;
 
     public static Action OnItemSpawned;
     public static Action OnItemCollected;
+
+    private Transform[] _spawnerPoints;
 
     //network data
     private ushort _spawnItemId;
     private byte _spawnPointIndex;
     private byte _spawnItemIndex;
 
-    private void Start()
+    private void Awake()
     {
-        _itemCount = 0;
-        _currentTimer = 0;
+        _spawnerPoints = GetComponentsInChildren<Transform>();
     }
-
     private void OnEnable()
     {
         OnItemSpawned += IncreaseItemCount;
         OnItemCollected += DecreaseItemCount;
     }
-
     private void OnDisable()
     {
         OnItemSpawned -= IncreaseItemCount;
         OnItemCollected -= DecreaseItemCount;
     }
-
     private void Update()
     {
-        if (Server.IsSuperGamer && Game.Instance.AllUserReady)
+        if (Server.IsSuperGamer && Game.Instance.IsAllReady)
         {
             CreateItem();
         }
     }
-    private void Receive()
+    private void OnValidate()
     {
-        Debug.Log("Receive");
-        if ((_itemCount < MaxCount))
+        _itemPrefabs = _spawnerData.ItemPrefabs;
+        _maxCount = _spawnerData.MaxCount;
+        _spawnSecconds = _spawnerData.SpawnSecconds;
+    }
+    private void Receive()
+    { 
+        if ((_itemCount < _maxCount))
         {
-            if (SpawnerPoints[_spawnPointIndex] != null)
+            if (_spawnerPoints[_spawnPointIndex] != null)
             {
                 //0번부터 아이템 배열의 길이까지 인덱스를 랜덤하게 구해서 랜덤한 아이템 객체를 가져옴
-                GameObject itemPrefab = ItemPrefabs[_spawnItemIndex];
+                GameObject itemPrefab = _itemPrefabs[_spawnItemIndex];
                 //랜덤한 아이템 스폰 포인트의 위치를 가져옴
-                Vector2 spawnPos = SpawnerPoints[_spawnPointIndex].transform.position;
+                Vector2 spawnPos = _spawnerPoints[_spawnPointIndex].transform.position;
                 //가져온 아이템을 스폰 포인트의 위치로 생성시킴.
                 spawnObject = Instantiate(itemPrefab, spawnPos, Quaternion.identity);
-                Items.Add(_spawnItemId, spawnObject);
+                _items.Add(_spawnItemId, spawnObject);
             }
         }
     }
     private void CreateItem()
     {
-        if (_itemCount > MaxCount)
+        if (_itemCount > _maxCount)
         {
-            _currentTimer = 0;
+            _spawnTimmer = 0;
         }
-        if (_itemCount < MaxCount)
+        if (_itemCount < _maxCount)
         {
-            _currentTimer += Time.deltaTime;
-            if (_currentTimer >= Spawnertimer)
+            _spawnTimmer += Time.deltaTime;
+            if (_spawnTimmer >= _spawnSecconds)
             {
-                _currentTimer = 0;
-                _spawnPointIndex = (byte)Random.Range(0, SpawnerPoints.Length);
+                _spawnTimmer = 0;
+                _spawnPointIndex = (byte)Random.Range(0, _spawnerPoints.Length);
 
-                while (SpawnerPoints[_spawnPointIndex] == null)
+                while (_spawnerPoints[_spawnPointIndex] == null)
                 {
-                    _spawnPointIndex = (byte)Random.Range(0, SpawnerPoints.Length);
+                    _spawnPointIndex = (byte)Random.Range(0, _spawnerPoints.Length);
                 }
 
-                if (SpawnerPoints[_spawnPointIndex] != null)
+                if (_spawnerPoints[_spawnPointIndex] != null)
                 {
                     //0번부터 아이템 배열의 길이까지 인덱스를 랜덤하게 구해서 랜덤한 아이템 객체를 가져옴
-                    _spawnItemIndex = (byte)Random.Range(0, ItemPrefabs.Length);
-                    GameObject itemPrefab = ItemPrefabs[_spawnItemIndex];
+                    _spawnItemIndex = (byte)Random.Range(0, _itemPrefabs.Length);
+                    GameObject itemPrefab = _itemPrefabs[_spawnItemIndex];
 
                     //랜덤한 아이템 스폰 포인트의 위치를 가져옴
-                    Vector3 spawnPos = SpawnerPoints[_spawnPointIndex].transform.position;
+                    Vector3 spawnPos = _spawnerPoints[_spawnPointIndex].transform.position;
                     //가져온 아이템을 스폰 포인트의 위치로 생성시킴.
                     spawnObject = Instantiate(itemPrefab, spawnPos, Quaternion.identity);
                     _spawnItemId = spawnObject.GetComponent<Item>().Id;
-                    Items.Add(_spawnItemId, spawnObject);
+                    _items.Add(_spawnItemId, spawnObject);
                     //어떤 아이템을 어떤 위치로 생성시켰는지 전송.
                     Send();
                 }
@@ -111,7 +122,7 @@ public class Spawner : MonoBehaviour, IReceiver, ISender
     }
     public GameObject FindItem(ushort id)
     {
-        GameObject item = Items[id];
+        GameObject item = _items[id];
         return item;
     }
     private void IncreaseItemCount()
