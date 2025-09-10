@@ -12,29 +12,38 @@ namespace SDW
         private Vector3 targetPosition;
         private bool movingToTarget = true;
 
+        // 추가: 플레이어가 닿아있는지 추적
+        private Transform onPlatform = null;
+        private Vector3 lastPosition;
+
         private void Awake()
         {
-            // 초기 위치와 목표 위치 설정
             startPosition = transform.position;
             targetPosition = new Vector3(
                 startPosition.x + moveDistanceX,
                 startPosition.y + moveDistanceY,
                 startPosition.z
             );
+            lastPosition = transform.position;
         }
 
         private void Update()
         {
             Move();
+
+            if(onPlatform != null)
+            {
+                Vector3 delta = transform.position - lastPosition;
+                onPlatform.position += delta;
+            }
+            lastPosition = transform.position;
         }
 
         private void Move()
         {
-            // 우선 목표 위치로 이동
             Vector3 destination = movingToTarget ? targetPosition : startPosition;
             transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
 
-            // 목표 위치에 도달했는지 확인
             if (Vector3.Distance(transform.position, destination) < 0.01f)
             {
                 transform.position = destination;
@@ -44,14 +53,12 @@ namespace SDW
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            // 플레이어를 자식으로 넣어서 팅기지 않도록 하기
-            collision.transform.SetParent(transform, true);
+            onPlatform = collision.transform;
         }
 
         private void OnCollisionExit2D(Collision2D collision)
         {
-            // 플레이어를 자식에서 빼기
-            collision.transform.SetParent(null);
+            onPlatform = null;
         }
     }
 }
