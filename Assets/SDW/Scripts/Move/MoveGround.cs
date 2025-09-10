@@ -12,10 +12,6 @@ namespace SDW
         private Vector3 targetPosition;
         private bool movingToTarget = true;
 
-        //network data
-        private bool isStuck;
-        private Vector2 moving;
-
         private void Awake()
         {
             // 초기 위치와 목표 위치 설정
@@ -36,9 +32,6 @@ namespace SDW
         {
             // 우선 목표 위치로 이동
             Vector3 destination = movingToTarget ? targetPosition : startPosition;
-            #region network data
-            moving = destination;
-            #endregion
             transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
 
             // 목표 위치에 도달했는지 확인
@@ -53,9 +46,6 @@ namespace SDW
         {
             if (collision.collider.CompareTag("Player"))
             {
-                #region network data
-                isStuck = true;
-                #endregion
                 // 플레이어를 자식으로 넣어서 팅기지 않도록 하기
                 collision.transform.SetParent(transform, true);
             }
@@ -65,9 +55,6 @@ namespace SDW
         {
             if (collision.collider.CompareTag("Player"))
             {
-                #region network data
-                isStuck = false;
-                #endregion
                 // 플레이어를 자식에서 빼기
                 collision.transform.SetParent(null);
             }

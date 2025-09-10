@@ -7,7 +7,13 @@ public class Object : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        {
+            Spawner.itemX = (sbyte)Mathf.RoundToInt(transform.position.x);
+        }
+
         if (isCollected == false) return;
+
         if (collision.gameObject.CompareTag("Player"))
         {
             Spawner.itemCount--;
@@ -25,6 +31,6 @@ public class Object : MonoBehaviour
 
     private void OnDestroy()
     {
-            Spawner.itemCount--;
+        Spawner.itemCount--;
     }
 }

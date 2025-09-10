@@ -7,7 +7,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float jumpForce = 12f;
     [SerializeField] private float gravity = 9.8f;
 
-    [SerializeField] private Vector2 groundCheckVecSize;
+    [SerializeField] private Vector2 groundCheckVecSize = new Vector2(0.5f, 1.05f);
     [SerializeField] private Vector2 groundCheckVec;
     [SerializeField] private LayerMask groundMask;
 
@@ -41,16 +41,14 @@ public class PlayerMovement : MonoBehaviour
         _rbCompo = GetComponent<Rigidbody2D>();
         _rbCompo.gravityScale = 1f;
         currentJumpCount = maxJumpCount;
+        groundMask = LayerMask.GetMask("Ground");
+        groundCheckVecSize = new Vector2(0.5f, 1.05f);
     }
 
     private void FixedUpdate()
     {
         OnGround();
         GroundDash();
-        if (!_isDashing)
-        {
-            GetComponent<SpriteRenderer>().color = new Color(1,1,1,1);
-        }
         AirDash();
         if (!_isDashing)
         {
@@ -110,7 +108,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void GroundDash()
     {
-        if (_isDashing && !_isGrounded)
+        if (_isDashing && _isGrounded)
         {
             _rbCompo.AddForce(new Vector2(_dashDirection.x,0) * dashForce,ForceMode2D.Impulse);
             _dashTimer -= Time.fixedDeltaTime;
@@ -124,7 +122,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void AirDash()
     {
-        if (_isDashing && _isGrounded)
+        if (_isDashing && !_isGrounded)
         {
             _rbCompo.linearVelocity = _dashDirection * dashForce / 2f;
             _dashTimer -= Time.fixedDeltaTime;

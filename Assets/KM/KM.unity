@@ -463,11 +463,20 @@ MonoBehaviour:
   groundCheckVecSize: {x: 0.75, y: 0.15}
   groundCheckVec: {x: 0, y: -0.51}
   groundMask:
-    serializedVersion: 2
     m_Bits: 64
   dashForce: 15
   dashDuration: 0.05
   maxJumpCount: 2
+  currentJumpCount: 0
+  _rbCompo: {fileID: 0}
+  _moveVec: {x: 0, y: 0}
+  _isGrounded: 0
+  _isJumpNow: 0
+  _isDashing: 0
+  _dashDirection: {x: 0, y: 0}
+  CanDash: 0
+  nowMoveDirection: 0
+  _dashTimer: 0
 --- !u!114 &1939079456
 MonoBehaviour:
   m_ObjectHideFlags: 0

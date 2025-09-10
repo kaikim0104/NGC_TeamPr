@@ -1,0 +1,21 @@
+namespace InputData.Platform;
+
+struct PlatformInfo{
+	id:ubyte;
+}
+
+table PlatformState {
+	platform_state:ubyte;
+}
+
+union PlatformMessageType{
+	state:PlatformState
+}
+
+table PlatformMessage{
+	data:PlatformMessageType;
+	sender_info:PlatformInfo;
+}
+
+file_identifier "PLFM";
+root_type PlatformMessage;

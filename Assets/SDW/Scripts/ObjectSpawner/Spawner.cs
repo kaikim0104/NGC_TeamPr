@@ -37,15 +37,15 @@ public class Spawner : MonoBehaviour
                 randomPoint = Random.Range(0, spawnerPoints.Length);
 
                 // 랜덤한 위치에 오브젝트 생성
-                Instantiate(Objects[Random.Range(0, Objects.Length)],
+                GameObject Obj = Instantiate(Objects[Random.Range(0, Objects.Length)],
                             spawnerPoints[randomPoint].transform.position,
                             Quaternion.identity);
+                Obj.AddComponent<Object>();
                 #region network data
                 spawnX = (sbyte)Mathf.RoundToInt(spawnerPoints[randomPoint].transform.position.x);
                 #endregion
                 itemCount++;
             }
         }
-
     }
 }

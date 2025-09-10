@@ -5,7 +5,7 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private float _minCameraSize = 6.5f;
     [SerializeField] private float _maxCameraSize = 8f;
     [SerializeField] private float _speed = 5f;
-    [SerializeField] private float _basu = 0.5f;
+    [SerializeField] private float _multiple = 0.5f;
 
     [SerializeField] private Transform _player1;
     [SerializeField] private Transform _player2;
@@ -47,7 +47,7 @@ public class PlayerCamera : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, _targetPos, _speed * Time.fixedDeltaTime);
 
         // 줌 (두 플레이어 사이 거리 기반)
-        float targetSize = Vector2.Distance(_player1.position, _player2.position) * _basu;
+        float targetSize = Vector2.Distance(_player1.position, _player2.position) * _multiple;
         _camera.orthographicSize = Mathf.Clamp(
             Mathf.Lerp(_camera.orthographicSize, targetSize, _speed * Time.fixedDeltaTime),
             _minCameraSize, _maxCameraSize);

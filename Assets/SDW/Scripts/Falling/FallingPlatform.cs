@@ -1,7 +1,8 @@
-using UnityEngine;
+using System;
 using System.Collections;
+using UnityEngine;
 
-public class FallingPlatform : MonoBehaviour
+public class FallingPlatform : Platform
 {
     [Header("레이어")]
     [SerializeField] private LayerMask PlayerLayerMask;
@@ -10,92 +11,111 @@ public class FallingPlatform : MonoBehaviour
     [SerializeField] private float durationTime = 2f;
     [SerializeField] private Color blinkColor = Color.red; // 깜빡일 색상
 
+    private event Action OnStepped;
+
     private Rigidbody2D rb;
     private SpriteRenderer sr;
-    private int PlayerLayer;
+    //private int PlayerLayer;
+    //플레이어와의 충돌을 감지할 레이어
+    private int PlayerLayer = 10;
+
+    //Duraition
     private float initialDuration;
-    private bool start = false;
-    private bool isBlinking = false;
+    private bool _isBlinking = false;
 
     //network data
-    private bool isstep = false;
-    private bool isfall = false;
+    public bool isOnPlatform = false;
 
     private void Start()
     {
-        PlayerLayer = Mathf.RoundToInt(Mathf.Log(PlayerLayerMask.value, 2));
+        //PlayerLayer = Mathf.RoundToInt(Mathf.Log(PlayerLayerMask.value, 2));
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         initialDuration = durationTime;
-    }
 
+        //플랫폼 위에 플레이어가 올라갔다면 이벤트 등록
+        OnStepped += () => 
+        { 
+            if (!_isBlinking) StartCoroutine(Blink()); 
+        } ;
+    }
     private void Update()
     {
-        if (start)
-            duration();
+        //만약 플레이어와 플랫폼 위에 올라와 있다면
+        if (isOnPlatform)
+        {
+            //할당된 시간 세기
+            OnStepped?.Invoke();
+            duration(); 
+        }
     }
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.gameObject.layer != PlayerLayer)
             return;
-        start = true;
-        #region network data
-        isstep = true;
-        #endregion
 
-        // 처음부터 아주 느리게 깜빡이기 시작
-        if (!isBlinking)
-            StartCoroutine(Blink());
+        isOnPlatform = true;
+
+        //플랫폼 위에 올라왔다면 이벤트 시작.
+        OnStepped?.Invoke();
+        SendData(isOnPlatform);
     }
 
     private void duration()
     {
+        //시간이 남았다면
         if (durationTime > 0)
         {
+            //계속 시간 세기
             durationTime -= Time.deltaTime;
         }
         else
         {
+            //아니라면 시간을 0초로 만든 후, 
             durationTime = 0f;
+            //모든 코루틴 멈추기
             StopAllCoroutines();
+            //플랫폼 떨어뜨리기
             StartCoroutine(Fall());
         }
     }
 
+    //플랫폼 깜빡이는 동작
     private IEnumerator Blink()
     {
-        isBlinking = true;
+        //깜박거리고 있음을 표시
+        _isBlinking = true;
         Color originalColor = sr.color;
 
+        //할당된 시간이 남았다면
         while (durationTime > 0)
         {
             float interval = 1f; // 기본 1초 간격
 
-            // 남은 시간 비율에 따라 속도 변경
+            //남은 시간 비율에 따라 속도 변경
             if (durationTime <= initialDuration * 0.25f)
                 interval = 0.25f;
             else if (durationTime <= initialDuration * 0.5f)
                 interval = 0.5f;
 
-            // 깜빡임
+            //깜빡임
             sr.color = blinkColor;
             yield return new WaitForSeconds(interval / 2f);
             sr.color = originalColor;
             yield return new WaitForSeconds(interval / 2f);
         }
 
+        //할당된 시간이 끝났다면 깜빡임 멈추기 
         sr.color = originalColor;
-        isBlinking = false;
+        _isBlinking = false;
     }
 
+    //플랫폼 떨어지는 동작
     private IEnumerator Fall()
     {
-        #region network data
-        isfall = true;
-        #endregion
         rb.gravityScale = 1f; // 중력 적용
         yield return new WaitForSeconds(0.5f); // 0.5초 후에 파괴
         Destroy(gameObject);
     }
+
 }

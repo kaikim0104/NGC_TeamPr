@@ -5,9 +5,22 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/KSY/_Scenes/AccountMenu.unity
+    guid: d412d4868dd471c4ebe6e0f79754199a
+  - enabled: 1
+    path: Assets/KSY/_Scenes/MainMenu.unity
+    guid: c3cdb95a0d4ff4c40bf4f9ddc6680673
+  - enabled: 0
+    path: Assets/KSY/_Scenes/InGame.unity
+    guid: 85c6eedd8d3002a40822e1c84f24ad3b
+  - enabled: 1
+    path: Assets/SDW/Scenes/Map/SDW_Map_1.unity
+    guid: 8d2843cbd2ee3b54c9119369e95680ff
   m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: dbb64b68a4662dc4bbdc155a708e3a22, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

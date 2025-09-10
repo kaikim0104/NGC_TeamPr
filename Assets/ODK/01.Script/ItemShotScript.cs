@@ -69,6 +69,51 @@ public class ItemShotScript : MonoBehaviour
         return dir;
     }
 
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (Keyboard.current.sKey.isPressed)
+        {
+            Item holditem = collision.gameObject.GetComponent<Item>();
+            if (holditem == null) return;
+
+
+            if (holditem.owner == gameObject)
+            {
+                Collider2D myCol = GetComponent<Collider2D>();
+                Collider2D itemCol = holditem.GetComponent<Collider2D>();
+                Physics2D.IgnoreCollision(myCol, itemCol, true);
+                return;
+            }
+
+
+            if (holditem.owner == null && !holditem.iscooldown && !holditem.isshooting)
+            {
+                if (holdObject != null)
+                {
+                    holdObject.GetComponent<Item>().owner = null;
+                    Rigidbody2D oldRb = holdObject.GetComponent<Rigidbody2D>();
+                    oldRb.simulated = true;
+                    oldRb.gravityScale = 2.75f;
+                    oldRb.transform.parent = null;
+                    oldRb.GetComponent<Collider2D>().isTrigger = false;
+                    holdObject.GetComponent<Item>().CooldownActive();
+                }
+                
+                // �� ������ ���
+                holdObject = holditem.gameObject;
+                holditem.owner = gameObject;
+                holditem.Grab();
+                Rigidbody2D rbh = holditem.GetComponent<Rigidbody2D>();
+                rbh.simulated = false;
+                rbh.transform.parent = holdTransform;
+                rbh.gravityScale = 2.75f;
+                rbh.GetComponent<Collider2D>().isTrigger = false;
+                holditem.transform.localPosition = Vector2.zero;
+            }
+        }
+
+    }
+
     private void OnCollisionStay2D(Collision2D collision)
     {
 
@@ -96,17 +141,22 @@ public class ItemShotScript : MonoBehaviour
                     Rigidbody2D oldRb = holdObject.GetComponent<Rigidbody2D>();
                     oldRb.simulated = true;
                     oldRb.transform.parent = null;
+                    oldRb.gravityScale = 2.75f;
+                    oldRb.GetComponent<Collider2D>().isTrigger = false;
                     holdObject.GetComponent<Item>().CooldownActive();
                 }
 
                 // �� ������ ���
                 holdObject = holditem.gameObject;
                 holditem.owner = gameObject;
-
+                
                 Rigidbody2D rbh = holditem.GetComponent<Rigidbody2D>();
                 rbh.simulated = false;
                 rbh.transform.parent = holdTransform;
+                rbh.gravityScale = 2.75f;
+                rbh.GetComponent<Collider2D>().isTrigger = false;
                 holditem.transform.localPosition = Vector2.zero;
+                
             }
         }
         

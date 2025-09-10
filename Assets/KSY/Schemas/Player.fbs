@@ -1,0 +1,23 @@
+namespace InputData.Player;
+
+table Movement {
+  movement_state:ubyte;
+  move_x:byte;
+  dash_x:byte;
+  dash_y:byte;
+}
+
+table ItemAction{
+	action_state:ubyte;
+}
+
+union PlayerMessageType{
+	item_action:ItemAction,
+	movement:Movement
+}
+
+table PlayerMessage{
+	data:PlayerMessageType;
+}
+file_identifier "PLYR";
+root_type PlayerMessage;
